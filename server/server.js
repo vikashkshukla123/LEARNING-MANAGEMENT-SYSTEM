@@ -1,29 +1,19 @@
-import express from "express";
-import cors from "cors";
-import "dotenv/config";
-import connectDB from "./configs/mongodb.js";
-import { clerkWebhooks } from "./controllers/webhooks.js";
-
+import express from 'express'
+import cors from 'cors'
+import 'dotenv/config'
+import connectDB from './configs/mongodb.js'   // ✅ default import
+import { clerkWebhooks } from './controllers/webhooks.js'
 
 // initialize express
-const app = express();
+const app = express()
 
-// CONNECT TO DATBASE
-
+// CONNECT TO DATABASE
 await connectDB()
 
-await connectDB();
+app.use(cors())
 
-// middlewares
-app.use(cors());
+app.get('/', (req, res) => res.send("API Working"))
+app.post('/clerk',express.json(), clerkWebhooks)
 
-// ROUTES
-app.get("/", (req, res) => res.send("API Working"));
-app.pos('/clerk', express.json(), clerkWebhooks)
-
-// port
 const PORT = process.env.PORT || 5000
-
-app.listen(PORT, () => {
-    console.log(`Server running on ${process.env.PORT}`);
-});
+app.listen(PORT, () => console.log(`Server is running on port ${PORT}`))

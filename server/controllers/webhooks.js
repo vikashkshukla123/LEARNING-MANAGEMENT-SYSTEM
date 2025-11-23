@@ -116,82 +116,12 @@
 // };
 
 
-
-import { Webhook } from "svix";
-import User from "../models/User.js";
 import Stripe from "stripe";
 import Purchase from "../models/Purchase.js";
 import Course from "../models/Course.js";
-
-
-// ----------------------
-// CLERK WEBHOOK
-// ----------------------
-export const clerkWebhooks = async (req, res) => {
-  try {
-    const wh = new Webhook(process.env.CLERK_WEBHOOK_SECRET);
-
-    // Verify using raw body
-    const evt = wh.verify(req.rawBody, {
-      "svix-id": req.headers["svix-id"],
-      "svix-timestamp": req.headers["svix-timestamp"],
-      "svix-signature": req.headers["svix-signature"],
-    });
-
-    const { data, type } = evt;
-
-    switch (type) {
-      case "user.created": {
-        const userData = {
-          _id: data.id,
-          email: data.email_addresses?.[0]?.email_address,
-          name: `${data.first_name || ""} ${data.last_name || ""}`.trim(),
-          imageUrl: data.image_url,
-        };
-
-        await User.create(userData);
-        return res.status(200).json({ success: true });
-      }
-
-      case "user.updated": {
-        const updatedData = {
-          email: data.email_addresses?.[0]?.email_address,
-          name: `${data.first_name || ""} ${data.last_name || ""}`.trim(),
-          imageUrl: data.image_url,
-        };
-
-        await User.findByIdAndUpdate(data.id, updatedData);
-        return res.status(200).json({ success: true });
-      }
-
-      case "user.deleted": {
-        await User.findByIdAndDelete(data.id);
-        return res.status(200).json({ success: true });
-      }
-
-      default:
-        return res.status(200).json({ received: true });
-    }
-  } catch (error) {
-    return res.status(400).json({ success: false, message: error.message });
-  }
-};
-
-// ----------------------
-// STRIPE INSTANCE
-// ----------------------
-
-
-// ----------------------
-// STRIPE WEBHOOK
-// ----------------------
-// ----------------------
-// STRIPE WEBHOOK — FIXED
-// ----------------------
-
+import User from "../models/User.js";
 
 export const stripeWebhooks = async (req, res) => {
-  // Initialize Stripe INSIDE the function (fixes undefined key issue)
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
   const sig = req.headers["stripe-signature"];
@@ -199,7 +129,7 @@ export const stripeWebhooks = async (req, res) => {
 
   try {
     event = stripe.webhooks.constructEvent(
-      req.rawBody,
+      req.body, // IMPORTANT: use raw body
       sig,
       process.env.STRIPE_WEBHOOK_SECRET
     );
@@ -208,52 +138,40 @@ export const stripeWebhooks = async (req, res) => {
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
-  switch (event.type) {
-    case "payment_intent.succeeded": {
-      const paymentIntent = event.data.object;
+  // --------------------
+  // ✔ Correct event
+  // --------------------
+  if (event.type === "checkout.session.completed") {
+    const session = event.data.object;
 
-      const sessionList = await stripe.checkout.sessions.list({
-        payment_intent: paymentIntent.id,
-      });
+    const purchaseId = session.metadata.purchaseId;
 
-      const metadata = sessionList.data[0].metadata;
-      const purchaseId = metadata.purchaseId;
+    if (!purchaseId) {
+      console.error("❌ No purchaseId found in metadata");
+      return res.status(400).send("Missing purchaseId");
+    }
 
-      const purchase = await Purchase.findById(purchaseId);
-      const user = await User.findById(purchase.userId);
-      const course = await Course.findById(purchase.courseId);
+    const purchase = await Purchase.findById(purchaseId);
+    if (!purchase) return res.status(404).send("Purchase not found");
 
-      // Add course to user
+    const user = await User.findById(purchase.userId);
+    const course = await Course.findById(purchase.courseId);
+
+    // Update User
+    if (!user.enrolledCourses.includes(course._id))
       user.enrolledCourses.push(course._id);
-      await user.save();
+    await user.save();
 
-      // Add user to course
+    // Update Course
+    if (!course.enrolledStudents.includes(user._id))
       course.enrolledStudents.push(user._id);
-      await course.save();
+    await course.save();
 
-      // Mark purchase completed
-      purchase.status = "completed";
-      await purchase.save();
-      break;
-    }
+    // Mark purchase completed
+    purchase.status = "completed";
+    await purchase.save();
 
-    case "payment_intent.payment_failed": {
-      const paymentIntent = event.data.object;
-
-      const sessionList = await stripe.checkout.sessions.list({
-        payment_intent: paymentIntent.id,
-      });
-
-      const purchaseId = sessionList.data[0].metadata.purchaseId;
-      const purchase = await Purchase.findById(purchaseId);
-
-      purchase.status = "failed";
-      await purchase.save();
-      break;
-    }
-
-    default:
-      console.log(`Unhandled event type: ${event.type}`);
+    console.log("✅ Purchase completed:", purchaseId);
   }
 
   return res.json({ received: true });

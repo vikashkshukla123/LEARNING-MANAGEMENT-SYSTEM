@@ -13,11 +13,13 @@ import MyCourses from './pages/educator/MyCourses'
 import StudentsEnrolled from './pages/educator/StudentsEnrolled'
 import Navbar from './components/student/Navbar'
 import "quill/dist/quill.snow.css";
+import { ToastContainer } from 'react-toastify';
 
 const App = () => {
   const isEducatorRoute = useMatch('/educator/*')
   return (
     <div className='text-default min-h-screen bg-white'>
+      <ToastContainer />
       {!isEducatorRoute && <Navbar/>}
       
       <Routes>
@@ -43,3 +45,106 @@ const App = () => {
 }
 
 export default App
+
+
+// import React, { useState } from 'react';
+// import axios from 'axios';
+
+// const AddCourse = () => {
+//   const [courseTitle, setCourseTitle] = useState('');
+//   const [description, setDescription] = useState('');
+//   const [price, setPrice] = useState('');
+//   const [image, setImage] = useState(null);
+//   const [loading, setLoading] = useState(false);
+//   const [message, setMessage] = useState('');
+
+//   const handleSubmit = async (e) => {
+//     e.preventDefault();
+
+//     if (!courseTitle || !description || !price || !image) {
+//       setMessage("Please fill all fields and attach an image");
+//       return;
+//     }
+
+//     setLoading(true);
+//     setMessage('');
+
+//     try {
+//       // Prepare courseData JSON
+//       const courseData = {
+//         courseTitle,
+//         description,
+//         price: parseFloat(price),
+//       };
+
+//       // Create FormData
+//       const formData = new FormData();
+//       formData.append('image', image);
+//       formData.append('courseData', JSON.stringify(courseData));
+
+//       // Make request
+//       const response = await axios.post(
+//         'http://localhost:5000/api/educator/add-course',
+//         formData,
+//         {
+//           headers: {
+//             'Content-Type': 'multipart/form-data',
+//           },
+//           withCredentials: true, // if using cookies / Clerk auth
+//         }
+//       );
+
+//       if (response.data.success) {
+//         setMessage(response.data.message);
+//         // Reset form
+//         setCourseTitle('');
+//         setDescription('');
+//         setPrice('');
+//         setImage(null);
+//       } else {
+//         setMessage(response.data.message || "Error adding course");
+//       }
+//     } catch (error) {
+//       console.error(error);
+//       setMessage(error.response?.data?.message || error.message);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   return (
+//     <div className="add-course-form">
+//       <h2>Add Course</h2>
+//       {message && <p>{message}</p>}
+//       <form onSubmit={handleSubmit}>
+//         <input
+//           type="text"
+//           placeholder="Course Title"
+//           value={courseTitle}
+//           onChange={(e) => setCourseTitle(e.target.value)}
+//         />
+//         <textarea
+//           placeholder="Description"
+//           value={description}
+//           onChange={(e) => setDescription(e.target.value)}
+//         />
+//         <input
+//           type="number"
+//           placeholder="Price"
+//           value={price}
+//           onChange={(e) => setPrice(e.target.value)}
+//         />
+//         <input
+//           type="file"
+//           accept="image/*"
+//           onChange={(e) => setImage(e.target.files[0])}
+//         />
+//         <button type="submit" disabled={loading}>
+//           {loading ? 'Uploading...' : 'Add Course'}
+//         </button>
+//       </form>
+//     </div>
+//   );
+// };
+
+// export default AddCourse;

@@ -1,16 +1,41 @@
-import express from 'express'
-import { addUserRating, getUserCourseProgress, getUserData, purchaseCourse, updateUserCourseProgress, userEnrolledCourses } from '../controllers/userController.js'
+import express from "express";
+import { requireAuth } from "@clerk/express";
 
+import {
+  addUserRating,
+  getUserCourseProgress,
+  getUserData,
+  purchaseCourse,
+  updateUserCourseProgress,
+  userEnrolledCourses,
+} from "../controllers/userController.js";
 
-const userRouter = express.Router()
+const userRouter = express.Router();
 
-userRouter.get('/data', getUserData)
-userRouter.get('/enrolled-courses', userEnrolledCourses)
-userRouter.post('/purchase', purchaseCourse)
-userRouter.post('/update-course-progress', updateUserCourseProgress)
-userRouter.post('/get-course-progress', getUserCourseProgress)
-userRouter.post('/add-rating', addUserRating)
+// User data
+userRouter.get("/data", requireAuth(), getUserData);
 
+// User enrolled courses
+userRouter.get("/enrolled-courses", requireAuth(), userEnrolledCourses);
 
+// Purchase course
+userRouter.post("/purchase", requireAuth(), purchaseCourse);
+
+// Update course progress
+userRouter.post(
+  "/update-course-progress",
+  requireAuth(),
+  updateUserCourseProgress
+);
+
+// Get course progress
+userRouter.post(
+  "/get-course-progress",
+  requireAuth(),
+  getUserCourseProgress
+);
+
+// Add rating
+userRouter.post("/add-rating", requireAuth(), addUserRating);
 
 export default userRouter;

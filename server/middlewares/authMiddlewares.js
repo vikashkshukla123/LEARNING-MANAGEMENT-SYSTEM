@@ -60,27 +60,70 @@
 //     res.status(500).json({ success: false, message: error.message });
 //   }
 // };
+// import { clerkClient } from "@clerk/express";
+
+// export const protectEducator = async (req, res, next) => {
+//   try {
+//     // ✔ Correct way to get userId with new Clerk SDK
+//     const userId = req.auth?.userId || req.auth()?.userId || req.user?.id;
+
+//     if (!userId) {
+//       return res.status(401).json({ success: false, message: "Unauthorized" });
+//     }
+
+//     const user = await clerkClient.users.getUser(userId);
+
+//     if (user.publicMetadata?.role !== "educator") {
+//       return res.status(403).json({ success: false, message: "Unauthorized Access" });
+//     }
+
+//     req.user = { id: userId }; // ✔ Needed so controllers can read req.user.id
+//     next();
+//   } catch (error) {
+//     console.error("protectEducator error:", error);
+//     res.status(500).json({ success: false, message: error.message });
+//   }
+// };
+
+
 import { clerkClient } from "@clerk/express";
 
 export const protectEducator = async (req, res, next) => {
+  console.log("===== REQUEST =====");
+console.log("Authorization:", req.headers.authorization);
+console.log("req.auth:", req.auth);
+console.log("req.user:", req.user);
   try {
-    // ✔ Correct way to get userId with new Clerk SDK
-    const userId = req.auth?.userId || req.auth()?.userId || req.user?.id;
+    console.log("===== protectEducator =====");
+    console.log("Authorization:", req.headers.authorization);
+    console.log("req.auth:", req.auth);
+    console.log("req.user:", req.user);
+
+    const userId = req.auth?.userId;
 
     if (!userId) {
-      return res.status(401).json({ success: false, message: "Unauthorized" });
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized",
+      });
     }
 
     const user = await clerkClient.users.getUser(userId);
 
     if (user.publicMetadata?.role !== "educator") {
-      return res.status(403).json({ success: false, message: "Unauthorized Access" });
+      return res.status(403).json({
+        success: false,
+        message: "Unauthorized Access",
+      });
     }
 
-    req.user = { id: userId }; // ✔ Needed so controllers can read req.user.id
+    req.user = { id: userId };
     next();
   } catch (error) {
-    console.error("protectEducator error:", error);
-    res.status(500).json({ success: false, message: error.message });
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 };

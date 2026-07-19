@@ -2,7 +2,7 @@
 
 
 
-import { clerkClient } from "@clerk/express";
+import { clerkClient ,getAuth } from "@clerk/express";
 import { v2 as cloudinary } from "cloudinary";
 import Course from "../models/Course.js";
 import Purchase from "../models/Purchase.js";
@@ -37,39 +37,37 @@ cloudinary.config({
 // };
 export const updateRoleEducator = async (req, res) => {
   try {
-    console.log("===== updateRoleEducator =====");
-    console.log("Authorization:", req.headers.authorization);
-    console.log("req.auth:", req.auth);
-    console.log("req.user:", req.user);
+    const auth = getAuth(req);
 
-    const { userId } = await req.auth();
+    console.log("AUTH OBJECT:", auth);
 
-if (!userId) {
-  return res.status(401).json({
-    success: false,
-    message: "Unauthorized",
-  });
-}
+    if (!auth.isAuthenticated) {
+      return res.status(401).json({
+        success: false,
+        message: "Not authenticated",
+      });
+    }
 
+    console.log("USER ID:", auth.userId);
 
-    await clerkClient.users.updateUserMetadata(userId, {
-      publicMetadata: { role: "educator" },
+    await clerkClient.users.updateUserMetadata(auth.userId, {
+      publicMetadata: {
+        role: "educator",
+      },
     });
 
-    res.json({
+    return res.json({
       success: true,
       message: "You can publish a course now",
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: error.message,
     });
   }
 };
-
-
 // ==========================
 // Add new course
 // ==========================

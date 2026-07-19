@@ -416,23 +416,56 @@ cloudinary.config({
 // ==========================
 // Update role to educator
 // ==========================
+// export const updateRoleEducator = async (req, res) => {
+//   try {
+//     const userId = req.user?.id || req.auth?.userId;
+//     if (!userId) {
+//       return res.status(401).json({ success: false, message: "Unauthorized" });
+//     }
+
+//     await clerkClient.users.updateUserMetadata(userId, {
+//       publicMetadata: { role: "educator" },
+//     });
+
+//     res.json({ success: true, message: "You can publish a course now" });
+//   } catch (error) {
+//     console.error("updateRoleEducator Error:", error);
+//     res.status(500).json({ success: false, message: error.message });
+//   }
+// };
 export const updateRoleEducator = async (req, res) => {
   try {
+    console.log("===== updateRoleEducator =====");
+    console.log("Authorization:", req.headers.authorization);
+    console.log("req.auth:", req.auth);
+    console.log("req.user:", req.user);
+
     const userId = req.user?.id || req.auth?.userId;
+
     if (!userId) {
-      return res.status(401).json({ success: false, message: "Unauthorized" });
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized",
+      });
     }
 
     await clerkClient.users.updateUserMetadata(userId, {
       publicMetadata: { role: "educator" },
     });
 
-    res.json({ success: true, message: "You can publish a course now" });
+    res.json({
+      success: true,
+      message: "You can publish a course now",
+    });
   } catch (error) {
-    console.error("updateRoleEducator Error:", error);
-    res.status(500).json({ success: false, message: error.message });
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
+
 
 // ==========================
 // Add new course

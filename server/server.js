@@ -35,7 +35,13 @@ app.post(
 
 // Middleware
 app.use(cors());
-app.use(clerkMiddleware());
+app.use(
+  clerkMiddleware({
+    authorizedParties: [
+      "https://learning-management-system-client-beryl.vercel.app",
+    ],
+  })
+);
 app.use(express.json());
 
 // Optional root route

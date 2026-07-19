@@ -98,15 +98,15 @@ console.log("req.user:", req.user);
     console.log("Authorization:", req.headers.authorization);
     console.log("req.auth:", req.auth);
     console.log("req.user:", req.user);
+    console.log(await req.auth());
+    const { userId } = await req.auth();
 
-    const userId = req.auth?.userId;
-
-    if (!userId) {
-      return res.status(401).json({
-        success: false,
-        message: "Unauthorized",
-      });
-    }
+if (!userId) {
+  return res.status(401).json({
+    success: false,
+    message: "Unauthorized",
+  });
+}
 
     const user = await clerkClient.users.getUser(userId);
 

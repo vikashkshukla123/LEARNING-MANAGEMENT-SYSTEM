@@ -22,6 +22,7 @@ const Navbar = () => {
         return;
       }
       const token = await getToken()
+      console.log("TOKEN:", token);
       const { data } = await axios.get(backendUrl + '/api/educator/update-role', { headers: { Authorization: `Bearer ${token}` } })
 
       if (data.success) {
@@ -31,9 +32,14 @@ const Navbar = () => {
         toast.error(data.message)
       }
 
-    } catch (error) {
-      toast.error(error.message)
+    }
+    catch (error) {
+      console.log("FULL ERROR:", error);
+      console.log("STATUS:", error.response?.status);
+      console.log("DATA:", error.response?.data);
+      console.log("HEADERS:", error.config?.headers);
 
+      toast.error(error.response?.data?.message || error.message);
     }
   }
 

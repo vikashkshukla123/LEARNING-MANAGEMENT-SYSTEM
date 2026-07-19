@@ -89,7 +89,7 @@
 import { clerkClient } from "@clerk/express";
 
 export const protectEducator = async (req, res, next) => {
-  console.log("===== REQUEST =====");
+  console.log("===== REQUESTs =====");
 console.log("Authorization:", req.headers.authorization);
 console.log("req.auth:", req.auth);
 console.log("req.user:", req.user);

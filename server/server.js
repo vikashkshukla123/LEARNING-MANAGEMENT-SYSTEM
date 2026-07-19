@@ -47,35 +47,34 @@ import courseRouter from "./routes/courseRoute.js";
 import userRouter from "./routes/userRoutes.js";
 
 import { stripeWebhooks } from "./controllers/paymentController.js";
+import { clerkWebhooks } from "./controllers/webhooks.js";
 
 const app = express();
 
 await connectDB();
 await connectCloudinary();
 
-// ------------------------------
-// STRIPE WEBHOOK — MUST COME FIRST
-// ------------------------------
-// app.post(
-//   "/webhook/stripe",
-//   express.raw({ type: "application/json" }),   // use express.raw (NOT bodyParser.raw)
-//   (req, res, next) => {
-//     req.rawBody = req.body;  // store raw body for Stripe signature
-//     next();
-//   },
-//   stripeWebhooks
-// );
 app.post(
   "/webhook/stripe",
   express.raw({ type: "application/json" }),  // REQUIRED
   stripeWebhooks
 );
-
+app.post(
+  "/webhook/clerk",
+  express.raw({ type: "application/json" }),
+  clerkWebhooks
+);
 // ------------------------------
 // BYPASS CLERK FOR WEBHOOKS
 // ------------------------------
 app.use((req, res, next) => {
-  if (req.path === "/webhook/stripe") return next();
+  if (
+    req.path === "/webhook/stripe" ||
+    req.path === "/webhook/clerk"
+  ) {
+    return next();
+  }
+
   return clerkMiddleware()(req, res, next);
 });
 

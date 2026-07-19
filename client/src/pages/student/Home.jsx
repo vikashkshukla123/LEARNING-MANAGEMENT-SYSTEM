@@ -15,9 +15,9 @@ const Home = () => {
       <Hero />
       <Companies />
       <CoursesSection />
-      <TestimonialsSection/>
-      <CallToAction/>
-      <Footer/>
+      <TestimonialsSection />
+      <CallToAction />
+      <Footer />
       {/* Add more components below */}
     </div>
   )

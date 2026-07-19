@@ -5,10 +5,28 @@ import Course from "../models/Course.js";
 import CourseProgress from "../models/CourseProgress.js"; // fixed import
 
 // Get user data
+// export const getUserData = async (req, res) => {
+//   try {
+//     const userId = req.auth.userId;
+//     const user = await User.findById(userId);
+
+//     if (!user) {
+//       return res.json({ success: false, message: "User Not Found" });
+//     }
+
+//     return res.json({ success: true, user });
+//   } catch (error) {
+//     return res.json({ success: false, message: error.message });
+//   }
+// };
+
 export const getUserData = async (req, res) => {
   try {
     const userId = req.auth.userId;
+    console.log("User ID from Clerk:", userId);
+
     const user = await User.findById(userId);
+    console.log("User found:", user);
 
     if (!user) {
       return res.json({ success: false, message: "User Not Found" });
@@ -16,6 +34,7 @@ export const getUserData = async (req, res) => {
 
     return res.json({ success: true, user });
   } catch (error) {
+    console.log(error);
     return res.json({ success: false, message: error.message });
   }
 };
@@ -48,7 +67,11 @@ export const purchaseCourse = async (req, res) => {
     }
 
     // Prevent duplicate purchase
-    if (userData.enrolledCourses.includes(courseId)) {
+    if (
+  userData.enrolledCourses.some(
+    id => id.toString() === courseId
+  )
+) {
       return res.json({ success: false, message: "Already enrolled in this course" });
     }
 
@@ -156,7 +179,12 @@ export const addUserRating = async (req, res) => {
     }
 
     const user = await User.findById(userId);
-    if (!user || !user.enrolledCourses.includes(courseId)) {
+    if (
+  !user ||
+  !user.enrolledCourses.some(
+    id => id.toString() === courseId
+  )
+) {
       return res.json({ success: false, message: "User has not purchased this course" });
     }
 

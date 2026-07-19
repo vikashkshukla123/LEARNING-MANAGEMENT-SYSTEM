@@ -11,7 +11,7 @@
 //           <img src={assets.accenture_logo} alt="Accenture" className='w-20 md:w-28' />
 //           <img src={assets.adobe_logo} alt="Adobe" className='w-20 md:w-28' />
 //           <img src={assets.paypal_logo} alt="Paypal" className='w-20 md:w-28' />
-          
+
 //         </div>
 //     </div>
 //   )

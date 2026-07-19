@@ -20,8 +20,8 @@ const App = () => {
   return (
     <div className='text-default min-h-screen bg-white'>
       <ToastContainer />
-      {!isEducatorRoute && <Navbar/>}
-      
+      {!isEducatorRoute && <Navbar />}
+
       <Routes>
         {/* Student Routes */}
         <Route path='/' element={<Home />} />

@@ -29,7 +29,12 @@ import { protectEducator } from '../middlewares/authMiddlewares.js';
 const router = express.Router();
 
 router.get('/update-role', updateRoleEducator);
-router.post('/add-course', upload.single('image'), protectEducator, addCourse);
+router.post(
+  '/add-course',
+  protectEducator,
+  upload.single('image'),
+  addCourse
+);
 router.get('/courses', protectEducator, getEducatorCourses);
 router.get('/dashboard', protectEducator, educatorDashboardData);
 router.get('/enrolled-students', protectEducator, getEnrolledStudentsData);

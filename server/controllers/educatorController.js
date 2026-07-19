@@ -497,7 +497,7 @@ export const addCourse = async (req, res) => {
     // Parse incoming JSON
     let parsedData = JSON.parse(req.body.courseData);
 
-    // 🔥🔥🔥 FIX: Transform courseContent to match schema
+    
     parsedData.courseContent = parsedData.courseContent.map(
       (chapter, chapterIndex) => ({
         chapterId: chapter.id, // frontend sends id
@@ -559,6 +559,7 @@ export const getEducatorCourses = async (req, res) => {
 // Educator dashboard data
 // ==========================
 export const educatorDashboardData = async (req, res) => {
+  console.log("🔥 educatorDashboardData reached");
   try {
     const educator = req.user?.id || req.auth?.userId;
     const courses = await Course.find({ educator });

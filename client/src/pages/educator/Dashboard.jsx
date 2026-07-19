@@ -4,35 +4,55 @@ import { assets, dummyDashboardData } from '../../assets/assets'
 import Loading from '../../components/student/Loading'
 import axios from 'axios'
 import { toast } from 'react-toastify'
+console.log("Dashboard rendered");
 
 const Dashboard = () => {
-  const {currency,backendUrl, isEducator, getToken} = useContext(AppContext)
-  const [dashboardData,setDashboardData] = useState(null)
+  const { currency, backendUrl, isEducator, getToken } = useContext(AppContext)
+  const [dashboardData, setDashboardData] = useState(null)
 
-  const fetchDashboardData = async()=>{
+  const fetchDashboardData = async () => {
+    console.log("fetchDashboardData called");
+
+    const token = await getToken();
+    console.log("Token:", token);
+
+    const { data } = await axios.get(
+      backendUrl + "/api/educator/dashboard",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    console.log("Response:", data);
     try {
       const token = await getToken()
-      const {data} = await axios.get(backendUrl + '/api/educator/dashboard' ,{headers : {Authorization : `Bearer ${token}`}})
+      const { data } = await axios.get(backendUrl + '/api/educator/dashboard', { headers: { Authorization: `Bearer ${token}` } })
 
-      if(data.success){
+      if (data.success) {
         setDashboardData(data.dashboardData)
-      }else{
+      } else {
         toast.error(data.message)
       }
-      
-    } catch (error) {
-      toast.error(error.message)
+
+    }
+    catch (error) {
+      console.log(error.response?.data);
+      toast.error(error.response?.data?.message || error.message);
     }
   }
+  console.log("isEducator =", isEducator);
+  console.log("backendUrl =", backendUrl);
 
-  useEffect(()=>{
-    if(isEducator){
-    fetchDashboardData()
+  useEffect(() => {
+    if (isEducator) {
+      fetchDashboardData()
     }
-  },[isEducator])
+  }, [isEducator])
 
   return dashboardData ? (
-    <div className='min-h-screen flex flex-cols items-start justify-between gap-8 md:p-8 md:pb-0 p-4 pt-8 pb-0'>
+    <div className='min-h-screen flex flex-col items-start justify-between gap-8 md:p-8 md:pb-0 p-4 pt-8 pb-0'>
       <div className='space-y-5'>
         <div className='flex flex-wrap gap-5 items-center'>
           <div className='flex items-center gap-3 shadow-card border border-blue-500 p-4 w-56 rounded-md'>
@@ -59,35 +79,35 @@ const Dashboard = () => {
             </div>
 
           </div>
-          
+
         </div>
 
         <div>
           <h2 className='pb-4 text-lg font-medium'>Latest Enrollments</h2>
           <div className='flex flex-col items-center max-w-4xl w-full overflow-hidden rounded-md bg-white border border-gray-500/20'>
-          <table className='table-fixed md:table-auto w-full overflow-hidden'>
-            <thead className='text-gray-900 border-b border-gray-500/20 text-sm text-left'>
-            <tr>
-              <th className='px-4 py-3 font-semibold text-center hidden sm:table-cell'>#</th>
-              <th className='px-4 py-3 font-semibold'>Students Name</th>
-              <th className='px-4 py-3 font-semibold'>Course Title</th>
-            </tr>
-            </thead>
-            <tbody className='text-sm text-gray-500'>
-              {dashboardData.enrolledStudentsData.map((item,index)=>(
-                <tr key={index} className='border-b border-gray-500/20'>
-                  <td className='px-4 py-3 text-center hidden sm:table-cell'>{index + 1}</td>
-                  <td className='md:px-4 px-2 py-3 flex items-center space-x-3'>
-                    <img src={item.student.imageUrl} alt="profile"  className='w-9 h-9 rounded-full'/>
-                    <span className='truncate'>{item.student.name}</span>
-                  </td>
-                  <td className='px-4 py-3 truncate'>{item.courseTitle}</td>
+            <table className='table-fixed md:table-auto w-full overflow-hidden'>
+              <thead className='text-gray-900 border-b border-gray-500/20 text-sm text-left'>
+                <tr>
+                  <th className='px-4 py-3 font-semibold text-center hidden sm:table-cell'>#</th>
+                  <th className='px-4 py-3 font-semibold'>Students Name</th>
+                  <th className='px-4 py-3 font-semibold'>Course Title</th>
                 </tr>
+              </thead>
+              <tbody className='text-sm text-gray-500'>
+                {dashboardData.enrolledStudentsData.map((item, index) => (
+                  <tr key={index} className='border-b border-gray-500/20'>
+                    <td className='px-4 py-3 text-center hidden sm:table-cell'>{index + 1}</td>
+                    <td className='md:px-4 px-2 py-3 flex items-center space-x-3'>
+                      <img src={item.student.imageUrl} alt="profile" className='w-9 h-9 rounded-full' />
+                      <span className='truncate'>{item.student.name}</span>
+                    </td>
+                    <td className='px-4 py-3 truncate'>{item.courseTitle}</td>
+                  </tr>
 
-              ))}
-            </tbody>
+                ))}
+              </tbody>
 
-          </table>
+            </table>
 
           </div>
         </div>
@@ -95,10 +115,10 @@ const Dashboard = () => {
 
       </div>
 
-        
+
     </div>
   )
-  : <Loading/>
+    : <Loading />
 }
 
 export default Dashboard

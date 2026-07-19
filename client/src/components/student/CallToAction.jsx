@@ -29,7 +29,7 @@ const CallToAction = () => {
       </h1>
 
       <p className="text-gray-600 text-sm md:text-base max-w-2xl leading-relaxed">
-        Access world-class courses from any device, anytime. Empower your learning journey without boundaries. 
+        Access world-class courses from any device, anytime. Empower your learning journey without boundaries.
         Whether you’re at home, on the go, or in class — gain new skills at your own pace with our flexible online platform.
       </p>
 
@@ -38,7 +38,7 @@ const CallToAction = () => {
           Get Started
         </button>
         <button className="flex items-center gap-2 text-blue-600 hover:underline">
-          Learn More 
+          Learn More
           <img className="w-4" src={assets.arrow_icon} alt="arrow_icon" />
         </button>
       </div>

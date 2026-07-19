@@ -46,7 +46,7 @@
 
 //         </div>
 //       </form>
-      
+
 //     </div>
 //   )
 
@@ -57,7 +57,7 @@
 
 //   return (
 //     <div>
-        
+
 //     </div>
 //   )
 // }
@@ -584,9 +584,9 @@
 //       }
 //     } catch (error) {
 //       toast.error(error.message)
-      
+
 //     }
- 
+
 //   };
 
 //   return (
@@ -991,6 +991,7 @@ const AddCourse = () => {
 
   const handleCourseSubmit = async (e) => {
     e.preventDefault();
+    console.log("ADD COURSE CLICKED");
     if (!courseTitle.trim()) return toast.error('Course title is required');
     if (!image) return toast.error('Thumbnail not selected');
     if (chapters.length === 0) return toast.error('Add at least one chapter');
@@ -1009,16 +1010,22 @@ const AddCourse = () => {
         discount: Number(discount),
         courseContent: chapters,
       };
+      console.log("COURSE DATA");
+      console.log(courseData);
 
       const formData = new FormData();
       formData.append('courseData', JSON.stringify(courseData));
       formData.append('image', image);
+      console.log("IMAGE:", image);
+      console.log("FORMDATA CREATED");
 
       const token = await getToken();
+      console.log("TOKEN:", token);
+      console.log("CALLING API...");
       const { data } = await axios.post(backendUrl + '/api/educator/add-course', formData, {
         headers: { Authorization: `Bearer ${token}` },
       });
-
+      console.log("API RESPONSE:", data);
       if (data.success) {
         toast.success(data.message);
         setCourseTitle('');
@@ -1030,8 +1037,15 @@ const AddCourse = () => {
       } else {
         toast.error(data.message);
       }
-    } catch (error) {
-      toast.error(error.message);
+    }
+    catch (error) {
+      console.log("ERROR:", error);
+      console.log("STATUS:", error.response?.status);
+      console.log("DATA:", error.response?.data);
+
+      toast.error(
+        error.response?.data?.message || error.message
+      );
     }
   };
 
@@ -1133,9 +1147,8 @@ const AddCourse = () => {
                       src={assets.dropdown_icon}
                       width={16}
                       alt="toggle"
-                      className={`mr-3 cursor-pointer transform transition-transform ${
-                        chapter.collapsed ? '-rotate-90' : 'rotate-0'
-                      }`}
+                      className={`mr-3 cursor-pointer transform transition-transform ${chapter.collapsed ? '-rotate-90' : 'rotate-0'
+                        }`}
                       onClick={() => toggleChapterCollapse(chapter.id)}
                     />
                     <span className="font-semibold">

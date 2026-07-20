@@ -23,6 +23,8 @@ export const updateRoleEducator = async (req, res) => {
 
     console.log("AUTH OBJECT:", auth);
 
+console.log("DEBUG INFO:", auth.debug());
+
     if (!auth.userId) {
       return res.status(401).json({
         success: false,

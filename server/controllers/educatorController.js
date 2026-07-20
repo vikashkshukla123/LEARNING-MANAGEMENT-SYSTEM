@@ -24,11 +24,11 @@ export const updateRoleEducator = async (req, res) => {
     console.log("AUTH OBJECT:", auth);
 
     if (!auth.userId) {
-  return res.status(401).json({
-    success: false,
-    message: "Not authenticated",
-  });
-}
+      return res.status(401).json({
+        success: false,
+        message: "Not authenticated",
+      });
+    }
 
     console.log("USER ID:", auth.userId);
 

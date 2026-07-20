@@ -15,38 +15,20 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_SECRET_KEY,
 });
 
-// ==========================
-// Update role to educator
-// ==========================
-// export const updateRoleEducator = async (req, res) => {
-//   try {
-//     const userId = req.user?.id || req.auth?.userId;
-//     if (!userId) {
-//       return res.status(401).json({ success: false, message: "Unauthorized" });
-//     }
 
-//     await clerkClient.users.updateUserMetadata(userId, {
-//       publicMetadata: { role: "educator" },
-//     });
 
-//     res.json({ success: true, message: "You can publish a course now" });
-//   } catch (error) {
-//     console.error("updateRoleEducator Error:", error);
-//     res.status(500).json({ success: false, message: error.message });
-//   }
-// };
 export const updateRoleEducator = async (req, res) => {
   try {
     const auth = getAuth(req);
 
     console.log("AUTH OBJECT:", auth);
 
-    if (!auth.isAuthenticated) {
-      return res.status(401).json({
-        success: false,
-        message: "Not authenticated",
-      });
-    }
+    if (!auth.userId) {
+  return res.status(401).json({
+    success: false,
+    message: "Not authenticated",
+  });
+}
 
     console.log("USER ID:", auth.userId);
 
@@ -68,44 +50,6 @@ export const updateRoleEducator = async (req, res) => {
     });
   }
 };
-// ==========================
-// Add new course
-// ==========================
-// export const addCourse = async (req, res) => {
-//   try {
-//     const educatorId = req.user?.id || req.auth?.userId;
-
-//     console.log("Educator ID:", educatorId);
-//     console.log("Request file:", req.file);
-//     console.log("Request body:", req.body);
-
-//     if (!educatorId) return res.status(401).json({ success: false, message: "Unauthorized" });
-//     if (!req.file) return res.status(400).json({ success: false, message: "Thumbnail image is required" });
-//     if (!req.body.courseData) return res.status(400).json({ success: false, message: "Course data is required" });
-
-//     let parsedCourseData;
-//     try {
-//       parsedCourseData = JSON.parse(req.body.courseData);
-//     } catch (err) {
-//       return res.status(400).json({ success: false, message: "Invalid JSON in courseData" });
-//     }
-
-//     parsedCourseData.educator = educatorId;
-
-//     // Upload thumbnail to Cloudinary
-//     const uploadedImg = await cloudinary.uploader.upload(req.file.path, { folder: "courses" });
-//     parsedCourseData.courseThumbnail = uploadedImg.secure_url;
-
-//     const newCourse = await Course.create(parsedCourseData);
-
-//     res.status(201).json({ success: true, message: "Course added successfully", course: newCourse });
-//   } catch (error) {
-//     console.error("addCourse Error:", error);
-//     res.status(500).json({ success: false, message: error.message });
-//   }
-// };
-
-
 
 export const addCourse = async (req, res) => {
   try {

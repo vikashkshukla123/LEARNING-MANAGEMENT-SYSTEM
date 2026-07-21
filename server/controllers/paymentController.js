@@ -27,6 +27,8 @@ export const stripeWebhooks = async (req, res) => {
   if (event.type === "checkout.session.completed") {
     const session = event.data.object;
     const purchaseId = session.metadata.purchaseId;
+    console.log("Entered checkout.session.completed");
+console.log("Metadata:", session.metadata);
 
     const purchase = await Purchase.findById(purchaseId);
     if (!purchase) {
